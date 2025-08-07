@@ -3,7 +3,15 @@ import Options from "./Options";
 import { useOrderDetails } from "../../contexts/OrderDetails";
 import { formatCurrency } from "../../utilities";
 
-export default function OrderEntry({ setOrderPhase }) {
+//defining the order phase type
+type OrderPhase = "inProgress" | "review" | "completed";
+
+//defining the props interface
+interface OrderEntryProps {
+  setOrderPhase: (phase: OrderPhase) => void;
+}
+
+export default function OrderEntry({ setOrderPhase }: OrderEntryProps) {
   const { totals } = useOrderDetails();
 
   // disable order button if there aren't any scoops in order
