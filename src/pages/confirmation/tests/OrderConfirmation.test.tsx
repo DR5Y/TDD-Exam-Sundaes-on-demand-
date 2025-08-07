@@ -5,6 +5,9 @@ import { HttpResponse, http } from "msw";
 import OrderConfirmation from "../OrderConfirmation";
 
 test("error response from server for submitting order", async () => {
+  //mock function for setOrderPhase prop
+  const mockSetOrderPhase = jest.fn();
+
   // override default msw response for options endpoint with error response
   server.resetHandlers(
     http.post("http://localhost:3030/order", () => {
@@ -12,7 +15,7 @@ test("error response from server for submitting order", async () => {
     })
   );
 
-  render(<OrderConfirmation />);
+  render(<OrderConfirmation setOrderPhase={mockSetOrderPhase} />);
 
   const alert = await screen.findByRole("alert");
   expect(alert).toHaveTextContent(

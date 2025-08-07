@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
 import Row from "react-bootstrap/Row";
 import ScoopOption from "./ScoopOption";
@@ -8,9 +8,22 @@ import { pricePerItem } from "../../constants";
 import { formatCurrency } from "../../utilities";
 import { useOrderDetails } from "../../contexts/OrderDetails";
 
-export default function Options({ optionType }) {
-  const [items, setItems] = useState([]);
-  const [error, setError] = useState(false);
+//define the option type
+type OptionType = "scoops" | "toppings";
+
+interface OptionItem {
+  name: string;
+  imagePath: string;
+}
+
+//define the props interface
+interface OptionProps {
+  optionType: OptionType;
+}
+
+export default function Options({ optionType }: OptionProps) {
+  const [items, setItems] = useState<OptionItem[]>([]);
+  const [error, setError] = useState<boolean>(false);
   const { totals } = useOrderDetails();
 
   // optionType is 'scoops' or 'toppings
@@ -18,8 +31,8 @@ export default function Options({ optionType }) {
     const controller = new AbortController();
     axios
       .get(`http://localhost:3030/${optionType}`, { signal: controller.signal })
-      .then((response) => setItems(response.data))
-      .catch((error) => {
+      .then((response: AxiosResponse<OptionItem[]>) => setItems(response.data))
+      .catch((error: any) => {
         if (error.name !== "CanceledError") setError(true);
       });
 
@@ -34,7 +47,7 @@ export default function Options({ optionType }) {
   const ItemComponent = optionType === "scoops" ? ScoopOption : ToppingOption;
   const title = optionType[0].toUpperCase() + optionType.slice(1).toLowerCase();
 
-  const optionItems = items.map((item) => (
+  const optionItems = items.map((item: OptionItem) => (
     <ItemComponent
       key={item.name}
       name={item.name}

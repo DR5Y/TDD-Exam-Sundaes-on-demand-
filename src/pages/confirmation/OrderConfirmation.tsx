@@ -1,20 +1,32 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import Button from "react-bootstrap/Button";
 import { useOrderDetails } from "../../contexts/OrderDetails";
 import AlertBanner from "../common/AlertBanner";
 
-export default function OrderConfirmation({ setOrderPhase }) {
+//Define the orderphase type
+type OrderPhase = "inProgress" | "review" | "complete";
+
+//Define the API response interface
+interface OrderResponse {
+  orderNumber: number;
+}
+
+interface OrderConfirmationProps {
+  setOrderPhase: (phase: OrderPhase) => void;
+}
+
+export default function OrderConfirmation({ setOrderPhase }: OrderConfirmationProps) {
   const { resetOrder } = useOrderDetails();
-  const [orderNumber, setOrderNumber] = useState(null);
-  const [error, setError] = useState(false);
+  const [orderNumber, setOrderNumber] = useState<number | null>(null);
+  const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
     axios
       // in a real app we would get order details from context
       // and send with POST
-      .post(`http://localhost:3030/order`)
-      .then((response) => {
+      .post<OrderResponse>(`http://localhost:3030/order`)
+      .then((response: AxiosResponse<OrderResponse>) => {
         setOrderNumber(response.data.orderNumber);
       })
       .catch(() => setError(true));
